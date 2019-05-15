@@ -21,7 +21,7 @@ plt.figure(1)
 plt.title('ECG Signal')
 plt.xlabel('Time (s)')
 plt.ylabel('Amplitude')
-plt.xlim(0,5)
+#plt.xlim(0,5)
 plt.grid()
 plt.plot(ts,signal,lw=2)
 
@@ -42,8 +42,8 @@ plt.plot(20*log10(ftsignal),color = 'G')
 
 
 
-bandpassfilter = remez(22, [0, 0.1, 0.3, 0.5], [5.0, 0.0]) 
-filtered_signal= lfilter(bandpassfilter, 1, signal)
+highpassfilter = remez(41, [0, 0.1, 0.15, 0.5], [0.0, 1.0]) #highpass 
+filtered_signal= lfilter(highpassfilter, 1, signal)
 
 plt.figure(3)
 plt.title('Filtered FFT ECG Signal')
@@ -54,12 +54,16 @@ plt.plot(20*log10(abs(fft((signal)))))
 plt.plot(15*log10(abs(fft(filtered_signal))))
 plt.legend(('FFTSignal' , 'FilteredFFTSignal'))
 
-# w, h = freqz(bandpassfilter)
-# plt.figure(4)
-# plt.plot(0.5*Fs*w/np.pi, 20*np.log10(np.abs(h)))
-
-
+w, h = freqz(highpassfilter)
+F = w / (2* np.pi)
 plt.figure(4)
+plt.title(r'Magnitude transfer function in dB')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Amplitude (dB)')
+plt.plot(F, 20*np.log10(np.abs(h)))
+
+
+plt.figure(5)
 freq, time, spec = sg.spectrogram(signal, Fs)
 
 plt.plot(spec)
@@ -69,9 +73,8 @@ plt.ylabel('Frequency [Hz]')
 plt.xlabel('Time [sec]')
 plt.xlim(0,20)
 #plt.ylim(0,100)
-#plt.plot(spec)
 
-plt.figure(5)
+plt.figure(6)
 plt.pcolormesh(time,freq,spec)
 plt.title('STFT Spectogram Of The ECG Signal')
 plt.ylabel('Frequency [Hz]')
